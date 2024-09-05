@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>meshware-samples</artifactId>
+        <groupId>com.jdcloud.jmsf</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>dubbo-provider-demo</artifactId>
+    <name>JMSF - MeshWare Dubbo Demo - Provider</name>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <jkube.generator.name>hub.jdcloud.com/mesh/jmsf-dubbo-provider:${project.version}</jkube.generator.name>
+        <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.jdcloud.jmsf</groupId>
+            <artifactId>demo-interface</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>2.7.23</version>
+        </dependency>
+        <!-- 采用Consul作为注册中心则需要，否则去除 -->
+        <dependency>
+            <groupId>com.jdcloud.jmsf</groupId>
+            <artifactId>dubbo-registry-consul</artifactId>
+        </dependency>
+
+        <!-- 采用Consul作为注册中心则需要，否则去除 -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-registry-nacos</artifactId>
+            <version>2.7.23</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <version>2.7.23</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-config-spring</artifactId>
+            <version>3.0.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-web</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-beans</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.7.18</version>
+                <configuration>
+                    <mainClass>com.jdcloud.jmsf.dubbo.provider.ProviderApplication</mainClass>
+                    <layout>ZIP</layout>
+                    <addResources>true</addResources>
+                    <outputDirectory>${project.build.directory}/deploy-package</outputDirectory>
+                    <finalName>dubbo-provider-demo</finalName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <!--<classifier>run</classifier> -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.jkube</groupId>
+                <artifactId>kubernetes-maven-plugin</artifactId>
+                <version>1.15.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+<!--                            <goal>resource</goal>-->
+<!--                            <goal>build</goal>-->
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--                    <pullRegistry>hub-vpc.jdcloud.com</pullRegistry>-->
+                    <pushRegistry>hub.jdcloud.com</pushRegistry>
+                    <!--                    <registry>hub.jdcloud.com</registry>-->
+                    <authConfig>
+                        <push>
+                            <username>jrwangwei3</username>
+                            <password>Jmsf1234</password>
+                        </push>
+                    </authConfig>
+                    <resources>
+                        <env>
+                            <organization>JMSF</organization>
+                            <projectname>${project.name}</projectname>
+                            <JMESH_SERVICE_NAMESPACE>default</JMESH_SERVICE_NAMESPACE>
+                            <JMESH_SERVICE_APP>jmsf-dubbo-provider-app</JMESH_SERVICE_APP>
+                            <JMESH_SERVICE_ID>jmsf-dubbo-provider-svc</JMESH_SERVICE_ID>
+                            <JMESH_SERVICE_VERSION>v1.0</JMESH_SERVICE_VERSION>
+                            <JMESH_SERVICE_GROUP>group1</JMESH_SERVICE_GROUP>
+                            <JMESH_SERVICE_CLUSTER>cluster1</JMESH_SERVICE_CLUSTER>
+                            <JMESH_REGISTRY_HOST>consul-service.istio-system.svc</JMESH_REGISTRY_HOST>
+                            <JMESH_REGISTRY_PORT>8500</JMESH_REGISTRY_PORT>
+                            <JMESH_MESH_GROUP>mesh01</JMESH_MESH_GROUP>
+                            <JMESH_SERVICE_DEPLOYMENT>dep1</JMESH_SERVICE_DEPLOYMENT>
+                            <ML_AZ>zone1</ML_AZ>
+                        </env>
+                        <!--                        <controllerName>my-deploymentname</controllerName>-->
+                        <!--                        <containerPrivileged>true</containerPrivileged>-->
+                        <imagePullPolicy>Always</imagePullPolicy>
+                        <replicas>3</replicas>
+                    </resources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <configuration>
+                    <skipSource>true</skipSource>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

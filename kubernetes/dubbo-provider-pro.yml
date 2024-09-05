@@ -1,0 +1,84 @@
+---
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: jmsf-dubbo-provider-demo
+      name: jmsf-dubbo-provider-demo
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 2
+      selector:
+        matchLabels:
+          app: jmsf-dubbo-provider-demo
+      template:
+        metadata:
+          labels:
+            app: jmsf-dubbo-provider-demo
+            jmsf.service.jindowin.jd.com/injection: "false"
+            jmsf.service.jindowin.jd.com/name: jmsf-dubbo-provider-demo
+            app.jindowin.jd.com/name: jmsf-dubbo-provider-demo
+            group.jindowin.jd.com/name: group1
+            service.jindowin.jd.com/region: region1
+            service.jindowin.jd.com/zone: cn-north-1a
+            living.jdap.io/unit: bj
+            app.jdap.io/region: region1
+            app.jdap.io/az: az1
+            # 多活类型，包括OneRegionLive(同城多活)和CrossRegionLive(异地多活)
+            living.jdap.io/livingType: oneRegionLive
+            # 类型，包括 center和unit
+            living.jdap.io/unitType: unit
+        spec:
+          containers:
+            - env:
+                - name: JMESH_MESH_GROUP
+                  value: mesh01
+                - name: JMESH_REGISTRY_HOST2
+                  value: 127.0.0.1
+                - name: JMESH_REGISTRY_PORT2
+                  value: "8848"
+                - name: JMESH_REGISTRY_TOKEN
+                  value: ab60d94a-3ad9-6219-f9b2-4d86f13583a6
+                - name: JMESH_REGISTRY_USERNAME2
+                  value: nacos
+                - name: JMESH_REGISTRY_PASSWORD2
+                  value: jmsf
+                - name: JMESH_SERVICE_APP
+                  value: jmsf-dubbo-provider-demo
+                - name: JMESH_SERVICE_ID
+                  value: jmsf-dubbo-provider-demo
+                - name: JMESH_SERVICE_GROUP
+                  value: app-group1
+                - name: JMESH_SERVICE_CLUSTER
+                  value: cluster1
+                - name: JMESH_SERVICE_DEPLOYMENT
+                  value: dep1
+                - name: JMESH_SERVICE_NAMESPACE
+                  value: default
+                - name: ML_AZ
+                  value: zone1
+                - name: KUBERNETES_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: HOSTNAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              image: hub.jdcloud.com/jmsf/jmsf-dubbo-provider-pro:1.3.9-SNAPSHOT-AMD64
+              imagePullPolicy: Always
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 2G
+                requests:
+                  cpu: "1"
+                  memory: 2G
+              name: jmsf-dubbo-provider-demo-pro
+              securityContext:
+                privileged: false
+#          imagePullSecrets:
+#            - name: docker-vpc
