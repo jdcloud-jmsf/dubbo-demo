@@ -37,12 +37,12 @@ public class ProviderApplication {
     @PropertySource("classpath:/spring/dubbo-provider.properties")
     static class ProviderConfiguration {
 
-        @Bean
-        public RegistryConfig registryConfig() {
-            RegistryConfig registryConfig = new RegistryConfig();
-            registryConfig.setAddress("jmsfconsul://127.0.0.1:8500");
-            // registryConfig.setGroup("dev");
-            return registryConfig;
-        }
+//        @Bean
+//        public RegistryConfig registryConfig() {
+//            RegistryConfig registryConfig = new RegistryConfig();
+//            registryConfig.setAddress("jmsfconsul://127.0.0.1:8500");
+//            // registryConfig.setGroup("dev");
+//            return registryConfig;
+//        }
     }
 }
